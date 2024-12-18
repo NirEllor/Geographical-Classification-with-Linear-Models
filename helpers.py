@@ -1,9 +1,9 @@
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.model_selection import train_test_split
+
+np.random.seed(42)
+
 
 
 def plot_decision_boundaries(model, X, y, title='Decision Boundaries'):
@@ -68,4 +68,5 @@ def read_data_demo(filename='train.csv'):
     data_numpy = df.values
 
     return data_numpy, col_names
+
 
