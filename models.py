@@ -87,7 +87,7 @@ def run_ridge_regression():
             pure_accuracy = np.mean(y_pred == y)
             accuracy = round(pure_accuracy, 6)
             accuracies[file_index, choice_index] = accuracy
-            print(f"Accuracy for lambda  = {choice}:", accuracy)
+            print(f"Accurac for lambda  = {choice}:", accuracy)
     # Plot results
     plot_accuracies(accuracies)
 
