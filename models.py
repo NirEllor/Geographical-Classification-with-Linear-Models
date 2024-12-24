@@ -113,7 +113,7 @@ def generate_X_y_from_csv(file):
     return X, y
 
 def process_file(file, file_index, X_train, y_train, accuracies):
-    file_name = file.split(".", 1)[0].capitalize()
+    # file_name = file.split(".", 1)[0].capitalize()
     # print(f"---------------- {file_name} -----------------")
     X, y = generate_X_y_from_csv(file)
 
@@ -400,8 +400,7 @@ def plot_decision_boundaries_with_best_learning_rate(n_classes, best_learning_ra
         loss = criterion(outputs.squeeze(), labels)
         loss.backward()
         optimizer.step()
-
-    X, y = generate_X_y_from_csv(files[0])
+    X, y = generate_X_y_from_csv(files[2])
 
     helpers.plot_decision_boundaries(best_model, X, y,
                                      title=f'Decision Boundaries for model with lr ={best_learning_rate}')
@@ -434,10 +433,10 @@ def run_logistic_regression(num_epochs, files, learning_rates, is_mult=False):
         # Train the model for a few epochs with GPU acceleration
         lr_train_loss_values, lr_validation_loss_values, lr_test_loss_values = [], [], []
         lr_train_accuracies, lr_validation_accuracies, lr_test_accuracies = [], [], []
-        for epoch in range(num_epochs + 1):
+        for epoch in range(num_epochs):
             train_loss_values, validation_loss_values, test_loss_values = [], [], []
             train_correct_predictions, validation_correct_predictions, test_correct_predictions = 0., 0., 0.
-            epoch_number = f" Epoch {epoch}" if epoch else "initialization"
+            # epoch_number = f" Epoch {epoch}" if epoch else "initialization"
             # print(f"\n------------------------ {epoch_number } ---------------------------- ")
             model.train()  # set the model to training mode
             run_train(train_loader, optimizer, model, criterion, train_loss_values, train_correct_predictions,
@@ -451,8 +450,8 @@ def run_logistic_regression(num_epochs, files, learning_rates, is_mult=False):
         plot_loss(lr_train_loss_values, lr_validation_loss_values, lr_test_loss_values, lr)
         # Plot the accuracy values through epochs
         plot_accuracy(lr_train_accuracies, lr_validation_accuracies, lr_test_accuracies, lr)
-        end_validations_accuracies.append(lr_validation_accuracies[-2])
-        end_test_accuracies.append(lr_test_accuracies[-2])
+        end_validations_accuracies.append(lr_validation_accuracies[-1])
+        end_test_accuracies.append(lr_test_accuracies[-1])
     print_best_validation_test_accuracy(learning_rates, end_validations_accuracies, end_test_accuracies)
     best_learning_rate = (print_best_learning_rate_and_test_by_validation
                           (end_validations_accuracies, end_test_accuracies, learning_rates))
@@ -462,9 +461,9 @@ def run_logistic_regression(num_epochs, files, learning_rates, is_mult=False):
 
 
 def plot_loss(lr_train_loss_values, lr_validation_loss_values, lr_test_loss_values, lr):
-    plt.plot(lr_train_loss_values[1:], label='Train', marker='o')
-    plt.plot(lr_validation_loss_values[1:], label='Validation', marker='o')
-    plt.plot(lr_test_loss_values[1:], label='Test', marker='o')
+    plt.plot(lr_train_loss_values, label='Train', marker='o')
+    plt.plot(lr_validation_loss_values, label='Validation', marker='o')
+    plt.plot(lr_test_loss_values, label='Test', marker='o')
     plt.xlabel('Epochs')
     plt.ylabel('Loss Value')
     plt.title(f'Loss Progression for Learning Rate {lr}')
@@ -493,7 +492,7 @@ def decision_tree(max_depth, file_name_train, file_name_test):
     accuracy = np.mean(predictions == y_test)
     print(f'{max_depth} depth Decision Tree Accuracy: {accuracy}')
 
-    helpers.plot_decision_boundaries(tree, X_train, y_train,
+    helpers.plot_decision_boundaries(tree, X_test, y_test,
                                      title=f"Decision boundaries for a Decision Tree with max_depth = {max_depth} ")
 
 def run_train_with_ridge_regularization(train_loader, len_train_dataset, optimizer, model, criterion, device):
@@ -517,7 +516,7 @@ def run_train_with_ridge_regularization(train_loader, len_train_dataset, optimiz
     accuracy = correct_predictions / len_train_dataset
     return accuracy
 
-def run_validation_with_ridge_regularization(validation_loader, len_validation_dataset, model, device):
+def run_validation_with_ridge_regularization(validation_loader, len_validation_dataset, model, device_name):
     """
     Validate the logistic regression model with ridge regularization.
     """
@@ -526,7 +525,7 @@ def run_validation_with_ridge_regularization(validation_loader, len_validation_d
 
     with torch.no_grad():
         for inputs, labels in validation_loader:
-            inputs, labels = inputs.to(device), labels.to(device)
+            inputs, labels = inputs.to(device_name), labels.to(device_name)
             outputs = model(inputs)
             correct_predictions += (torch.argmax(outputs, dim=1) == labels).sum().item()
 
@@ -559,7 +558,6 @@ def run_logistic_regression_with_ridge(num_epochs, files, lambdas, device):
     best_lambda = None
     best_validation_accuracy = 0
     best_model = None
-    criterion = None
     n_classes = len(torch.unique(train_dataset.labels))
 
 
@@ -592,27 +590,27 @@ def run_logistic_regression_with_ridge(num_epochs, files, lambdas, device):
 
 
     # Plot decision boundaries for the best model
-    X, y = generate_X_y_from_csv(files[0])
+    X, y = generate_X_y_from_csv(files[2])
     helpers.plot_decision_boundaries(best_model, X, y, f"Decision Boundaries with Best Lambda = {best_lambda}")
 
 
 
 if __name__ == '__main__':
     run_ridge_regression()
-    # print("\n")
-    # gradient_descent()
-    # print("\n")
-    # run_logistic_regression(10, BINARY_DATA, BINARY_LOGISTIC_LEARNING_RATES)
-    # print("\n")
-    # run_logistic_regression(30, MULTI_DATA, MULTI_LOGISTIC_LEARNING_RATES, True)
-    # print("\n")
+    print("\n")
+    gradient_descent()
+    print("\n")
+    run_logistic_regression(10, BINARY_DATA, BINARY_LOGISTIC_LEARNING_RATES)
+    print("\n")
+    run_logistic_regression(30, MULTI_DATA, MULTI_LOGISTIC_LEARNING_RATES, True)
+    print("\n")
     decision_tree(2, TRAIN_MULTI, TEST_MULTI)
-    # print("\n")
-    # decision_tree(10, TRAIN_MULTI, TEST_MULTI)
-    # print("\n")
-    # run_logistic_regression_with_ridge(
-    #     num_epochs=10,
-    #     files=MULTI_DATA,
-    #     lambdas=RIDGE_LEARNING_RATES,
-    #     device=device)
+    print("\n")
+    decision_tree(10, TRAIN_MULTI, TEST_MULTI)
+    print("\n")
+    run_logistic_regression_with_ridge(
+        num_epochs=10,
+        files=MULTI_DATA,
+        lambdas=RIDGE_LEARNING_RATES,
+        device=device)
 
