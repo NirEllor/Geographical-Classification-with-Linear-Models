@@ -1,9 +1,10 @@
-
 import numpy as np
 import torch
 from matplotlib import pyplot as plt
 from torch import nn
 import helpers
+from sklearn.tree import DecisionTreeClassifier
+
 
 GRADIENT_DESCENT_ITERATIONS = 1000
 
@@ -675,7 +676,7 @@ def decision_tree(max_depth, file_name_train, file_name_test):
     X_test, y_test = test_data[:, :-1], test_data[:, -1]
 
     # Initialize and train the decision tree classifier
-    tree = helpers.DecisionTreeClassifier(max_depth=max_depth)
+    tree = DecisionTreeClassifier(max_depth=max_depth)
     tree.fit(X_train, y_train)
 
     # Predict and evaluate accuracy on the test data
@@ -810,18 +811,18 @@ def run_logistic_regression_with_ridge(num_epochs, files, lambdas, device_name):
 
 
 if __name__ == '__main__':
-    # run_ridge_regression()
-    # print("\n")
-    # gradient_descent()
-    # print("\n")
-    # run_logistic_regression(10, BINARY_DATA, BINARY_LOGISTIC_LEARNING_RATES)
-    # print("\n")
-    # run_logistic_regression(30, MULTI_DATA, MULTI_LOGISTIC_LEARNING_RATES, True)
-    # print("\n")
-    # decision_tree(2, TRAIN_MULTI, TEST_MULTI)
-    # print("\n")
-    # decision_tree(10, TRAIN_MULTI, TEST_MULTI)
-    # print("\n")
+    run_ridge_regression()
+    print("\n")
+    gradient_descent()
+    print("\n")
+    run_logistic_regression(10, BINARY_DATA, BINARY_LOGISTIC_LEARNING_RATES)
+    print("\n")
+    run_logistic_regression(30, MULTI_DATA, MULTI_LOGISTIC_LEARNING_RATES, True)
+    print("\n")
+    decision_tree(2, TRAIN_MULTI, TEST_MULTI)
+    print("\n")
+    decision_tree(10, TRAIN_MULTI, TEST_MULTI)
+    print("\n")
     run_logistic_regression_with_ridge(
         num_epochs=10,
         files=MULTI_DATA,
